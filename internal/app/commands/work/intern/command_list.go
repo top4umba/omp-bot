@@ -22,8 +22,8 @@ func (c *WorkInternCommander) List(inputMessage *tgbotapi.Message) {
 
 	outputMsgText := fmt.Sprintf("Interns from %d to %d out of %d: \n", offset+1, right, len(interns))
 
-	for _, i := range interns[offset:right] {
-		outputMsgText += fmt.Sprintf("Name: %s, Internship Id: %d, Unique Id: %s\n", i.Name, i.InternshipID, i.UniqueKey)
+	for _, intern := range interns[offset:right] {
+		outputMsgText += fmt.Sprintf("%s\n", intern)
 	}
 
 	msg := tgbotapi.NewMessage(inputMessage.Chat.ID, outputMsgText)
@@ -52,6 +52,7 @@ func (c *WorkInternCommander) List(inputMessage *tgbotapi.Message) {
 	if err != nil {
 		log.Printf("DemoSubdomainCommander.List: error sending reply message to chat - %v", err)
 	}
+	offset = 0
 }
 
 func (c *WorkInternCommander) getButton(newOffset int, buttonText string) tgbotapi.InlineKeyboardButton {
@@ -70,7 +71,7 @@ func (c *WorkInternCommander) getButton(newOffset int, buttonText string) tgbota
 }
 
 func getNextOffset(internsSize int) int {
-	if offset <= internsSize-PageSize {
+	if offset < internsSize-PageSize {
 		return offset + PageSize
 	} else {
 		return offset

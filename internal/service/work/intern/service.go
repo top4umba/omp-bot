@@ -2,7 +2,6 @@ package intern
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 )
 
 type Service interface {
@@ -24,35 +23,34 @@ func (s *InternService) List() []Intern {
 }
 
 func (s *InternService) Describe(internID uint64) (*Intern, error) {
-	_, intern, ok := getIntern(internID)
-	if ok {
+	idx, intern := getIntern(internID)
+	if idx >= 0 {
 		return &intern, nil
 	}
 	return nil, fmt.Errorf("cannot find intern with id %d", internID)
 }
 
 func (s *InternService) Create(intern Intern) (uint64, error) {
-	newUUID, err := uuid.NewUUID()
-	intern.UniqueKey = newUUID
-	intern.InternshipID = getNextInternshipId()
+	intern.UniqueKey = getNextInternId()
 	allInterns = append(allInterns, intern)
-	return intern.InternshipID, err
+	return intern.UniqueKey, nil
 }
 
 func (s *InternService) Update(internID uint64, intern Intern) error {
-	idx, _, removed := getIntern(internID)
-	if !removed {
+	idx, _ := getIntern(internID)
+	if idx < 0 {
 		return fmt.Errorf("cannot find intern with id %d", internID)
-
 	}
-
-	allInterns[idx].Name = intern.Name
+	updatedIntern := allInterns[idx]
+	updatedIntern.Name = intern.Name
+	updatedIntern.InternshipID = intern.InternshipID
+	allInterns[idx] = updatedIntern
 	return nil
 }
 
 func (s *InternService) Remove(internID uint64) (bool, error) {
-	idx, _, ok := getIntern(internID)
-	if ok {
+	idx, _ := getIntern(internID)
+	if idx >= 0 {
 		allInterns[idx] = allInterns[len(allInterns)-1]
 		allInterns = allInterns[:len(allInterns)-1]
 		return true, nil
@@ -60,13 +58,13 @@ func (s *InternService) Remove(internID uint64) (bool, error) {
 	return false, nil
 }
 
-func getIntern(internID uint64) (int, Intern, bool) {
+func getIntern(internID uint64) (int, Intern) {
 	var res Intern
 	for idx, intern := range allInterns {
-		if intern.InternshipID == internID {
+		if intern.UniqueKey == internID {
 			res = intern
-			return idx, res, true
+			return idx, res
 		}
 	}
-	return -1, res, false
+	return -1, res
 }

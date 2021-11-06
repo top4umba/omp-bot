@@ -17,16 +17,16 @@ func (c *WorkInternCommander) Delete(inputMessage *tgbotapi.Message) {
 	}
 
 	ok, err := c.internService.Remove(uint64(internId))
-	if err != nil {
-		log.Printf("fail to delete intern with id %s", internId)
-		return
-	}
-
 	var msgText string
-	if ok {
-		msgText = fmt.Sprintf("Intern with id %d was removed", internId)
+	if err != nil {
+		log.Printf("Server error. Fail to delete intern with id %d", internId)
+		return
 	} else {
-		msgText = fmt.Sprintf("Couldn't delete intern with id %d ", internId)
+		if ok {
+			msgText = fmt.Sprintf("Intern with id %d was removed", internId)
+		} else {
+			msgText = fmt.Sprintf("There is no intern with id %d ", internId)
+		}
 	}
 
 	msg := tgbotapi.NewMessage(

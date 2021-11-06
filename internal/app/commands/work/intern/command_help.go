@@ -12,8 +12,8 @@ func (c *WorkInternCommander) Help(inputMessage *tgbotapi.Message) {
 			"/get__work__intern {id} — get an intern with id={id}\n"+
 			"/list__work__intern — list all the interns \n"+
 			"/delete__work__intern {id} — delete an intern with id={id}\n"+
-			"/new__work__intern {name} — add new intern "+
-			"/edit__work__intern {id} {name} — edit an intern with id={id}",
+			"/new__work__intern {internship_id} {name} — add new intern\n"+
+			"/edit__work__intern {id} {internship_id} {name} — edit an intern with id={id}",
 	)
 
 	_, err := c.bot.Send(msg)
